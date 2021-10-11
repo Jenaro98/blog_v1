@@ -74,6 +74,14 @@ class Comment(db.Model):
     parent_post = relationship("BlogPost", back_populates="comments")
     text = db.Column(db.Text, nullable=False)
 
+class Message(db.Model):
+    __tablename__ = "messages"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    email = db.Column(db.String(100), unique=True)
+    phone = db.Column(db.Text, nullable=False)
+    message = db.Column(db.Text, nullable=False)
+
 
 db.create_all()
 
@@ -176,23 +184,27 @@ def about():
     return render_template("about.html", current_user=current_user)
 
 
-# @app.route("/contact")
-# def contact():
-#     return render_template("contact.html", current_user=current_user)
-
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
     if request.method == "POST":
+        # data = request.form
+        data = request.form
+        send_email(data["name"], data["email"], data["phone"], data["message"])
         return render_template("contact.html", msg_sent=True)
     return render_template("contact.html", msg_sent=False)
 
 
-# def send_email(name, email, phone, message):
-#     email_message = f"Subject:New Message\n\nName: {name}\nEmail: {email}\nPhone: {phone}\nMessage:{message}"
-    # with smtplib.SMTP("smtp.gmail.com",port=587) as connection:
-    #     connection.starttls()
-    #     connection.login(OWN_EMAIL, OWN_PASSWORD)
-    #     connection.sendmail(OWN_EMAIL, OWN_EMAIL, email_message)
+def send_email(name, email, phone, message):
+    # email_message = f"Subject:New Message\n\nName: {name}\nEmail: {email}\nPhone: {phone}\nMessage:{message}"
+    new_message = Message(
+        name= name,
+        email= email,
+        phone= phone,
+        message= message,
+    )
+    db.session.add(new_message)
+    db.session.commit()
+
 
 
 @app.route("/new-post", methods=["GET", "POST"])
@@ -246,6 +258,22 @@ def delete_post(post_id):
     db.session.delete(post_to_delete)
     db.session.commit()
     return redirect(url_for('get_all_posts'))
+
+@app.route("/messages")
+@admin_only
+def get_all_messages():
+    messages = Message.query.all()
+    return render_template("messages.html", messages=messages, current_user=current_user)
+
+
+@app.route("/delete-message/<int:message_id>", methods=["GET","POST"])
+@admin_only
+def delete_message(message_id):
+    message_to_delete = Message.query.get(message_id)
+    db.session.delete(message_to_delete)
+    db.session.commit()
+    return redirect(url_for('get_all_messages'))
+
 
 @app.route("/delete-comment/<int:post_id>/<int:comment_id>", methods=["GET","POST"])
 @login_required
