@@ -18,6 +18,8 @@ OWN_PASSWORD = os.environ.get("PASSWORD")
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
+app.config['MAILGUN_KEY'] =  os.environ.get("MAILGUN_KEY")
+app.config['MAILGUN_DOMAIN'] = os.environ.get("MAILGUN_DOMAIN")
 ckeditor = CKEditor(app)
 Bootstrap(app)
 gravatar = Gravatar(app, size=30, rating='g', default='retro', force_default=False, force_lower=False, use_ssl=False, base_url=None)
@@ -190,10 +192,21 @@ def contact():
 
 def send_email(name, email, phone, message):
     email_message = f"Subject:New Message\n\nName: {name}\nEmail: {email}\nPhone: {phone}\nMessage:{message}"
-    with smtplib.SMTP("smtp.gmail.com",port=587) as connection:
-        connection.starttls()
-        connection.login(OWN_EMAIL, OWN_PASSWORD)
-        connection.sendmail(OWN_EMAIL, OWN_EMAIL, email_message)
+    # with smtplib.SMTP("smtp.gmail.com",port=587) as connection:
+    #     connection.starttls()
+    #     connection.login(OWN_EMAIL, OWN_PASSWORD)
+    #     connection.sendmail(OWN_EMAIL, OWN_EMAIL, email_message)
+    r = requests.post("https://api.mailgun.net/v2/%s/messages" % app.config['MAILGUN_DOMAIN'],
+             auth=("api", app.config['MAILGUN_KEY']),
+             data={
+                 "from": from_address,
+                 "to": to_address,
+                 "subject": subject,
+                 "text": plaintext,
+                 "html": html
+             }
+             )
+    return r
 
 
 @app.route("/new-post", methods=["GET", "POST"])
