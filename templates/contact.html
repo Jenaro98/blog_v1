@@ -60,7 +60,7 @@
 <!--          <div id="success"></div>-->
 <!--          <button type="submit" class="btn btn-primary" id="sendMessageButton">Send</button>-->
 <!--        </form>-->
-           <form name="contact" id="fcf-form-id" class="fcf-form-class" method="post" netlify-honeypot="bot-field" data-netlify-recaptcha="true" data-netlify="true" >
+           <form name="contact" id="fcf-form-id" class="fcf-form-class" method="post" netlify-honeypot="bot-field" data-netlify-recaptcha="true" data-netlify="true" action="{{ url_for('contact') }}" novalidate>
 
                                             <div class="fcf-form-group">
                                                 <label for="Name" class="fcf-label">Your name</label>
@@ -84,7 +84,7 @@
                                             </div>
                                             <div data-netlify-recaptcha="true" id="centercap" class="mb-2"></div>
                                             <div class="fcf-form-group">
-                                                <button type="submit" id="fcf-button" class="fcf-btn fcf-btn-primary fcf-btn-lg fcf-btn-block">Send Message</button>
+                                                <button type="submit" class="btn btn-primary" id="sendMessageButton">Send</button>-->
                                             </div>
 
                                         </form>
