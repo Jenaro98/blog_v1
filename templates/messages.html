@@ -21,9 +21,10 @@
         {% for message in messages %}
         <div class="post-preview">
           <p class="post-meta">Sent by
-            {{message.name}}
-            email: {{message.email}}
-              phone: {{message.phone}}
+            {{message.name}} |
+            email: {{message.email}} |
+              phone: {{message.phone}} |
+            <br>
               message: {{message.message}}
             {% if current_user.id == 1: %}
             <a href="{{url_for('delete_message', message_id=message.id) }}">✘</a>
